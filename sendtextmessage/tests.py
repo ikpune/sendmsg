@@ -1,14 +1,16 @@
-from django.test import TestCase
-from rest_framework.test import APIRequestFactory
-import unittest
+from django.core.urlresolvers import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
+from .models import TextMessages
 
-# Create your tests here.
-
-class TestStringMethods(unittest.TestCase):
-
-    def test_upper(self):
-    	factory = APIRequestFactory()
-    	request = factory.post('/api/sendmsg/', {'msg': 'test message'})
-
-if __name__ == '__main__':
-    unittest.main()
+class AccountTests(APITestCase):
+    def test_send_msg(self):
+        """
+        Ensure we can create a new account object.
+        """
+        url = 'http://localhost:8000/api/sendmsg'
+        data = {'msg': 'Hello'}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(TextMessages.objects.count(), 1)
+        self.assertEqual(TextMessages.objects.get().text_message, 'Hello')
